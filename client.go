@@ -88,6 +88,9 @@ type ClientConfig struct {
 
 	// BasicAuth tells the APIClient if basic auth should be used (true) or token based auth must be used (false)
 	BasicAuth bool
+
+	// BearerToken token used for Bearer authentication
+	BearerToken string
 }
 
 // setupClientWithConfig setups the client using the client config
@@ -175,6 +178,12 @@ func (c *APIClient) setupClientAuth(config *ClientConfig) error {
 			if err != nil {
 				return err
 			}
+		}
+
+		c.auth = auth
+	} else if config.BearerToken != "" {
+		auth := &redfish.AuthToken{
+			BearerToken: config.BearerToken,
 		}
 
 		c.auth = auth
@@ -440,6 +449,8 @@ func (c *APIClient) runRawRequestWithHeaders(method, url string, payloadBuffer i
 		} else if c.auth.BasicAuth && c.auth.Username != "" && c.auth.Password != "" {
 			encodedAuth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", c.auth.Username, c.auth.Password)))
 			req.Header.Set("Authorization", fmt.Sprintf("Basic %v", encodedAuth))
+		} else if c.auth.BearerToken != "" {
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.auth.BearerToken))
 		}
 	}
 	req.Close = true

@@ -66,11 +66,12 @@ type Session struct {
 
 // AuthToken contains the authentication and session information.
 type AuthToken struct {
-	Token     string
-	Session   string
-	Username  string
-	Password  string
-	BasicAuth bool
+	Token       string
+	Session     string
+	Username    string
+	Password    string
+	BasicAuth   bool
+	BearerToken string
 }
 
 type authPayload struct {
